@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">orm-example</string>
+    <string name="email">Email</string>
+    <string name="password">Password</string>
+    <string name="enter">Enter</string>
+    <string name="register">Register</string>
+    <string name="name">Name</string>
+    <string name="description">Description</string>
+</resources>
