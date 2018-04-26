@@ -6,4 +6,11 @@
     <string name="register">Register</string>
     <string name="name">Name</string>
     <string name="description">Description</string>
+    <string name="add">Add</string>
+    <string name="remove">Remove</string>
+    <string name="detail">Detail</string>
+    <string name="date">Date</string>
+    <string name="completed">Completed</string>
+    <string name="created_by">Created by</string>
+    <string name="edit">Edit</string>
 </resources>

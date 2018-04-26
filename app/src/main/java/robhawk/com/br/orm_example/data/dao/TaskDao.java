@@ -1,5 +1,6 @@
 package robhawk.com.br.orm_example.data.dao;
 
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import robhawk.com.br.orm_example.data.model.Task;
@@ -22,7 +23,7 @@ public class TaskDao {
         REPOSITORY.delete(task.id);
     }
 
-    public void listAll() {
-        REPOSITORY.listAll();
+    public List<Task> listAll() {
+        return REPOSITORY.listAll();
     }
 }

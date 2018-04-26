@@ -27,4 +27,11 @@ public class UserDao {
                 return true;
         return false;
     }
+
+    public User findById(int id) {
+        for (User user : REPOSITORY.listAll())
+            if (user.id == id)
+                return user;
+        return null;
+    }
 }

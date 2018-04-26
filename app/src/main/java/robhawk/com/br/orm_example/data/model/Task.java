@@ -1,9 +1,10 @@
 package robhawk.com.br.orm_example.data.model;
 
+import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
-public class Task {
+public class Task implements Serializable {
     public int id;
     public String description;
     public Date date;
@@ -11,13 +12,13 @@ public class Task {
     public int idUser;
 
     public Task() {
-        this("", Calendar.getInstance().getTime(), false);
+        this("", Calendar.getInstance().getTime(), 0);
     }
 
-    public Task(String description, Date date, boolean completed) {
+    public Task(String description, Date date, int idUser) {
         this.description = description;
         this.date = date;
-        this.completed = completed;
+        this.idUser = idUser;
     }
 
     @Override
