@@ -52,7 +52,7 @@ public class TaskActivity extends AppCompatActivity {
 
     private void initData() {
         mUser = (User) getIntent().getSerializableExtra("user");
-        mTaskDao = new TaskDao();
+        mTaskDao = new TaskDao(this);
     }
 
     private void initViews() {

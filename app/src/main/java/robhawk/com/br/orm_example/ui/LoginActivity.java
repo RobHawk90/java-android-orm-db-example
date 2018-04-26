@@ -25,7 +25,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initViews();
-        mUserDao = new UserDao();
+        mUserDao = new UserDao(this);
     }
 
     private void initViews() {
