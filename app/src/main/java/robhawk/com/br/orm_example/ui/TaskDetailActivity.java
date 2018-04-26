@@ -8,6 +8,7 @@ import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -74,9 +75,11 @@ public class TaskDetailActivity extends AppCompatActivity {
         mTask.completed = mCompleted.isChecked();
         mTask.description = mDescription.getText().toString();
 
-        mTaskDao.update(mTask);
-
-        finish();
+        if (mTaskDao.update(mTask)) {
+            Toast.makeText(this, "'" + mTask.description + "' was updated", Toast.LENGTH_SHORT).show();
+            finish();
+        } else
+            Toast.makeText(this, "Can't update task '" + mTask.description + "'", Toast.LENGTH_SHORT).show();
     }
 
     private void initDatePickerDialog() {

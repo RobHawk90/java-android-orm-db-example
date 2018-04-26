@@ -10,6 +10,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import java.util.Calendar;
 import java.util.Date;
@@ -110,13 +111,20 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void remove(Task task) {
-        mTaskDao.delete(task);
-        mAdapter.remove(task);
+        if (mTaskDao.delete(task)) {
+            mAdapter.remove(task);
+            Toast.makeText(this, "Task '" + task.description + "' was removed", Toast.LENGTH_LONG).show();
+        } else
+            Toast.makeText(this, "Can't remove the '" + task.description + "' task", Toast.LENGTH_LONG).show();
     }
 
     private void toggleCompleted(Task task) {
         task.completed = !task.completed;
-        mTaskDao.update(task);
+        if (!mTaskDao.update(task)) {
+            Toast.makeText(this, "Can't flag '" + task.description + "' task as " + (task.completed ? "completed" : "uncompleted"), Toast.LENGTH_SHORT).show();
+            task.completed = !task.completed;
+            mAdapter.notifyDataSetChanged();
+        }
     }
 
     public void showDatePicker(View view) {
@@ -128,11 +136,15 @@ public class TaskActivity extends AppCompatActivity {
         String description = mDescription.getText().toString();
 
         Task task = new Task(description, date, mUser.id);
-        mTaskDao.insert(task);
-        mAdapter.add(task);
+        if (mTaskDao.insert(task)) {
+            mAdapter.add(task);
 
-        mDate.setText(DateUtil.formatPtBrNow());
-        mDescription.setText("");
-        mDescription.requestFocus();
+            mDate.setText(DateUtil.formatPtBrNow());
+            mDescription.setText("");
+            mDescription.requestFocus();
+
+            Toast.makeText(this, "'" + description + "' was added", Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "Can't add task '" + description + "'", Toast.LENGTH_SHORT).show();
     }
 }

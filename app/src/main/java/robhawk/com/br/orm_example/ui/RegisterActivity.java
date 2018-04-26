@@ -73,9 +73,10 @@ public class RegisterActivity extends AppCompatActivity {
         if (isEmailExists(email)) return;
 
         User user = new User(name, email, password);
-        mUserDao.insert(user);
-
-        startTaskActivity(user);
+        if (mUserDao.insert(user))
+            startTaskActivity(user);
+        else
+            Toast.makeText(this, name + ", can't register you now, please verify your information.", Toast.LENGTH_SHORT).show();
     }
 
     private boolean isEmailExists(String email) {
