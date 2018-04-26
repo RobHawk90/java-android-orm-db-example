@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.util.LinkedList;
 import java.util.List;
 
 public abstract class Dao<T> {
@@ -21,6 +22,35 @@ public abstract class Dao<T> {
 
     public SQLiteDatabase getRdb() {
         return helper.getReadableDatabase();
+    }
+
+    public T getResultObject(String sql, Object... params) {
+        T result = null;
+        Cursor cursor = getCursor(sql, params);
+        if (cursor.moveToNext())
+            result = extract(cursor);
+        cursor.close();
+        return result;
+    }
+
+    public List<T> getResultList(String sql, Object... params) {
+        List<T> result = new LinkedList<>();
+        Cursor cursor = getCursor(sql, params);
+        while (cursor.moveToNext())
+            result.add(extract(cursor));
+        cursor.close();
+        return result;
+    }
+
+    public Cursor getCursor(String sql, Object... params) {
+        return getRdb().rawQuery(sql, map(params));
+    }
+
+    private String[] map(Object[] params) {
+        String[] mappedParams = new String[params.length];
+        for (int i = 0; i < params.length; i++)
+            mappedParams[i] = params[i] == null ? "" : params[i].toString();
+        return mappedParams;
     }
 
     public abstract boolean insert(T model);

@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import robhawk.com.br.orm_example.data.model.User;
@@ -39,22 +38,21 @@ public class UserDao extends Dao<User> {
 
     @Override
     public User findById(int id) {
-        User result = null;
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM user WHERE id = " + id, null);
-        if (cursor.moveToNext())
-            result = extract(cursor);
-        cursor.close();
-        return result;
+        return getResultObject("SELECT * FROM user WHERE id = ?", id);
     }
 
     @Override
     public List<User> listAll() {
-        List<User> result = new LinkedList<>();
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM user", null);
-        while (cursor.moveToNext())
-            result.add(extract(cursor));
-        cursor.close();
-        return result;
+        return getResultList("SELECT * FROM user");
+    }
+
+    public User auth(String email, String password) {
+        return getResultObject("SELECT * FROM user WHERE email = ? AND password = ?", email, password);
+    }
+
+    public boolean isEmailExists(String email) {
+        Cursor cursor = getCursor("SELECT * FROM user WHERE email = ?", email);
+        return cursor.moveToNext();
     }
 
     @Override
@@ -76,19 +74,4 @@ public class UserDao extends Dao<User> {
         return user;
     }
 
-    public User auth(String email, String password) {
-        User result = null;
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM user WHERE email = ? AND password = ?", new String[]{email, password});
-        if (cursor.moveToNext())
-            result = extract(cursor);
-        cursor.close();
-        return result;
-    }
-
-    public boolean isEmailExists(String email) {
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM user WHERE email = ?", new String[]{email});
-        boolean exists = cursor.moveToNext();
-        cursor.close();
-        return exists;
-    }
 }

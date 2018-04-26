@@ -4,7 +4,6 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import robhawk.com.br.orm_example.data.model.Task;
@@ -40,22 +39,12 @@ public class TaskDao extends Dao<Task> {
 
     @Override
     public Task findById(int id) {
-        Task result = null;
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM task WHERE id = ?", new String[]{id + ""});
-        if (cursor.moveToNext())
-            result = extract(cursor);
-        cursor.close();
-        return result;
+        return getResultObject("SELECT * FROM task WHERE id = ?", id);
     }
 
     @Override
     public List<Task> listAll() {
-        List<Task> result = new LinkedList<>();
-        Cursor cursor = getRdb().rawQuery("SELECT * FROM task", null);
-        while (cursor.moveToNext())
-            result.add(extract(cursor));
-        cursor.close();
-        return result;
+        return getResultList("SELECT * FROM task");
     }
 
     @Override
