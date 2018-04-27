@@ -16,13 +16,6 @@ public class UserDao extends Dao<User> {
     }
 
     @Override
-    public boolean insert(User model) {
-        long result = getWdb().insert("user", null, values(model));
-        model.id = (int) result;
-        return result > -1;
-    }
-
-    @Override
     public boolean update(User model) {
         String where = "id = " + model.id;
         int result = getWdb().update("user", values(model), where, null);

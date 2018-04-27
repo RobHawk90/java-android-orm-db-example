@@ -17,13 +17,6 @@ public class TaskDao extends Dao<Task> {
     }
 
     @Override
-    public boolean insert(Task model) {
-        long result = getWdb().insert("task", null, values(model));
-        model.id = (int) result;
-        return result > -1;
-    }
-
-    @Override
     public boolean update(Task model) {
         String where = "id = " + model.id;
         int result = getWdb().update("task", values(model), where, null);

@@ -4,7 +4,13 @@ import java.io.Serializable;
 import java.util.Calendar;
 import java.util.Date;
 
+import robhawk.com.br.orm_example.orm.annotation.Id;
+import robhawk.com.br.orm_example.orm.annotation.Table;
+
+@Table("task")
 public class Task implements Serializable {
+
+    @Id
     public int id;
     public String description;
     public Date date;

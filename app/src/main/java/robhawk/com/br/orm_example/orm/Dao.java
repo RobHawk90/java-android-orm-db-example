@@ -5,8 +5,15 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
+import java.lang.reflect.Field;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
+
+import robhawk.com.br.orm_example.orm.annotation.Column;
+import robhawk.com.br.orm_example.orm.annotation.Id;
+import robhawk.com.br.orm_example.orm.annotation.Ignore;
+import robhawk.com.br.orm_example.orm.annotation.Table;
 
 public abstract class Dao<T> {
 
@@ -53,7 +60,69 @@ public abstract class Dao<T> {
         return mappedParams;
     }
 
-    public abstract boolean insert(T model);
+    public boolean insert(T model) {
+        try {
+            Class<?> modelType = model.getClass();
+
+            String tableName = "";
+            if (modelType.isAnnotationPresent(Table.class))
+                tableName = modelType.getAnnotation(Table.class).value();
+            if (tableName.isEmpty())
+                tableName = modelType.getSimpleName();
+
+            List<Field> fields = new LinkedList<>();
+            for (Field field : modelType.getDeclaredFields())
+                if (!field.isAnnotationPresent(Ignore.class) && !field.isAnnotationPresent(Id.class) && !field.getName().equals("serialVersionUID"))
+                    fields.add(field);
+
+            Field idField = null;
+            for (Field field : modelType.getDeclaredFields())
+                if (field.isAnnotationPresent(Id.class))
+                    idField = field;
+
+            ContentValues values = new ContentValues();
+
+            for (Field field : fields) {
+                Class<?> fieldType = field.getType();
+
+                String fieldName = field.getName();
+                if (field.isAnnotationPresent(Column.class))
+                    fieldName = field.getAnnotation(Column.class).value();
+
+                if (fieldType.equals(String.class))
+                    values.put(fieldName, field.get(model).toString());
+                else if (fieldType.equals(Integer.class) || fieldType.equals(int.class))
+                    values.put(fieldName, field.getInt(model));
+                else if (fieldType.equals(Double.class) || fieldType.equals(double.class))
+                    values.put(fieldName, field.getDouble(model));
+                else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class))
+                    values.put(fieldName, field.getBoolean(model));
+                else if (fieldType.equals(Long.class) || fieldType.equals(long.class))
+                    values.put(fieldName, field.getLong(model));
+                else if (fieldType.equals(Float.class) || fieldType.equals(float.class))
+                    values.put(fieldName, field.getFloat(model));
+                else if (fieldType.equals(Short.class) || fieldType.equals(short.class))
+                    values.put(fieldName, field.getShort(model));
+                else if (fieldType.equals(byte[].class))
+                    values.put(fieldName, (byte[]) field.get(model));
+                else if (fieldType.equals(Byte.class) || fieldType.equals(byte.class))
+                    values.put(fieldName, field.getByte(model));
+                else if (fieldType.equals(Date.class))
+                    values.put(fieldName, field.get(model).toString());
+            }
+
+            long result = getWdb().insert(tableName, null, values);
+
+            if (idField != null)
+                idField.setInt(model, (int) result);
+
+            return result > -1;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
     public abstract boolean update(T model);
 
