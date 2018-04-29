@@ -13,13 +13,11 @@ public class TaskDao extends Dao<Task> {
         super(context);
     }
 
-    @Override
     public Task findById(int id) {
-        return getResultObject(Task.class, "SELECT * FROM task WHERE id = ?", id);
+        return findById(id, Task.class);
     }
 
-    @Override
     public List<Task> listAll() {
-        return getResultList(Task.class, "SELECT * FROM task");
+        return listAll(Task.class);
     }
 }

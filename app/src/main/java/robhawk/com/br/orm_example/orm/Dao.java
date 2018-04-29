@@ -197,9 +197,22 @@ public abstract class Dao<T> {
         return false;
     }
 
-    public abstract List<T> listAll();
+    public List<T> listAll(Class<T> modelType) {
+        String tableName = getTableName(modelType);
+        String sql = "SELECT * FROM " + tableName;
+        return getResultList(modelType, sql);
+    }
 
-    public abstract T findById(int id);
+    public T findById(int id, Class<T> modelType) {
+        String tableName = getTableName(modelType);
+        Field idField = getIdField(modelType);
+        if (idField != null) {
+            String where = getIdFieldName(idField) + " = ?";
+            String sql = "SELECT * FROM " + tableName + " WHERE " + where;
+            return getResultObject(modelType, sql, id);
+        }
+        return null;
+    }
 
     public ContentValues values(T model) {
         try {

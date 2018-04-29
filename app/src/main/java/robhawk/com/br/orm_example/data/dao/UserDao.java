@@ -14,14 +14,12 @@ public class UserDao extends Dao<User> {
         super(context);
     }
 
-    @Override
     public User findById(int id) {
-        return getResultObject(User.class, "SELECT * FROM user WHERE id = ?", id);
+        return findById(id, User.class);
     }
 
-    @Override
     public List<User> listAll() {
-        return getResultList(User.class, "SELECT * FROM user");
+        return listAll(User.class);
     }
 
     public User auth(String email, String password) {
