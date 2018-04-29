@@ -1,6 +1,5 @@
 package robhawk.com.br.orm_example.data.dao;
 
-import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 
@@ -17,40 +16,21 @@ public class UserDao extends Dao<User> {
 
     @Override
     public User findById(int id) {
-        return getResultObject("SELECT * FROM user WHERE id = ?", id);
+        return getResultObject(User.class, "SELECT * FROM user WHERE id = ?", id);
     }
 
     @Override
     public List<User> listAll() {
-        return getResultList("SELECT * FROM user");
+        return getResultList(User.class, "SELECT * FROM user");
     }
 
     public User auth(String email, String password) {
-        return getResultObject("SELECT * FROM user WHERE email = ? AND password = ?", email, password);
+        return getResultObject(User.class, "SELECT * FROM user WHERE email = ? AND password = ?", email, password);
     }
 
     public boolean isEmailExists(String email) {
         Cursor cursor = getCursor("SELECT * FROM user WHERE email = ?", email);
         return cursor.moveToNext();
-    }
-
-    @Override
-    public ContentValues values(User model) {
-        ContentValues values = new ContentValues();
-        values.put("name", model.name);
-        values.put("email", model.email);
-        values.put("password", model.password);
-        return values;
-    }
-
-    @Override
-    public User extract(Cursor cursor) {
-        User user = new User();
-        user.id = cursor.getInt(cursor.getColumnIndex("id"));
-        user.name = cursor.getString(cursor.getColumnIndex("name"));
-        user.email = cursor.getString(cursor.getColumnIndex("email"));
-        user.password = cursor.getString(cursor.getColumnIndex("password"));
-        return user;
     }
 
 }

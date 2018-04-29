@@ -16,6 +16,7 @@ import robhawk.com.br.orm_example.orm.annotation.Column;
 import robhawk.com.br.orm_example.orm.annotation.Id;
 import robhawk.com.br.orm_example.orm.annotation.Ignore;
 import robhawk.com.br.orm_example.orm.annotation.Table;
+import robhawk.com.br.orm_example.util.DateUtil;
 
 public abstract class Dao<T> {
 
@@ -33,20 +34,20 @@ public abstract class Dao<T> {
         return helper.getReadableDatabase();
     }
 
-    public T getResultObject(String sql, Object... params) {
+    public T getResultObject(Class<T> modelType, String sql, Object... params) {
         T result = null;
         Cursor cursor = getCursor(sql, params);
         if (cursor.moveToNext())
-            result = extract(cursor);
+            result = extract(cursor, modelType);
         cursor.close();
         return result;
     }
 
-    public List<T> getResultList(String sql, Object... params) {
+    public List<T> getResultList(Class<T> modelType, String sql, Object... params) {
         List<T> result = new LinkedList<>();
         Cursor cursor = getCursor(sql, params);
         while (cursor.moveToNext())
-            result.add(extract(cursor));
+            result.add(extract(cursor, modelType));
         cursor.close();
         return result;
     }
@@ -89,10 +90,7 @@ public abstract class Dao<T> {
 
         for (Field field : fields) {
             Class<?> fieldType = field.getType();
-
-            String fieldName = field.getName();
-            if (field.isAnnotationPresent(Column.class))
-                fieldName = field.getAnnotation(Column.class).value();
+            String fieldName = getFieldName(field);
 
             if (fieldType.equals(String.class))
                 values.put(fieldName, field.get(model).toString());
@@ -113,10 +111,16 @@ public abstract class Dao<T> {
             else if (fieldType.equals(Byte.class) || fieldType.equals(byte.class))
                 values.put(fieldName, field.getByte(model));
             else if (fieldType.equals(Date.class))
-                values.put(fieldName, field.get(model).toString());
+                values.put(fieldName, DateUtil.formatPtBr((Date) field.get(model)));
         }
 
         return values;
+    }
+
+    private String getFieldName(Field field) {
+        if (field.isAnnotationPresent(Column.class))
+            return field.getAnnotation(Column.class).value();
+        return field.getName();
     }
 
     @Nullable
@@ -193,12 +197,59 @@ public abstract class Dao<T> {
         return false;
     }
 
-    public abstract T findById(int id);
-
     public abstract List<T> listAll();
 
-    public abstract ContentValues values(T model);
+    public abstract T findById(int id);
 
-    public abstract T extract(Cursor cursor);
+    public ContentValues values(T model) {
+        try {
+            Class<?> modelType = model.getClass();
+            List<Field> fields = getNonIgnoredNorIdFields(modelType);
+            return getContentValues(model, fields);
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public T extract(Cursor cursor, Class<T> modelType) {
+        try {
+            T model = modelType.newInstance();
+
+            List<Field> fields = getNonIgnoredNorIdFields(modelType);
+            fields.add(getIdField(modelType));
+
+            for (Field field : fields) {
+                Class<?> fieldType = field.getType();
+                String fieldName = getFieldName(field);
+
+                if (fieldType.equals(String.class))
+                    field.set(model, cursor.getString(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Integer.class) || fieldType.equals(int.class))
+                    field.set(model, cursor.getInt(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Double.class) || fieldType.equals(double.class))
+                    field.set(model, cursor.getDouble(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class))
+                    field.set(model, cursor.getInt(cursor.getColumnIndex(fieldName)) == 1);
+                else if (fieldType.equals(Long.class) || fieldType.equals(long.class))
+                    field.set(model, cursor.getLong(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Float.class) || fieldType.equals(float.class))
+                    field.set(model, cursor.getFloat(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Short.class) || fieldType.equals(short.class))
+                    field.set(model, cursor.getShort(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(byte[].class))
+                    field.set(model, cursor.getBlob(cursor.getColumnIndex(fieldName)));
+                else if (fieldType.equals(Date.class))
+                    field.set(model, DateUtil.parsePtBr(cursor.getString(cursor.getColumnIndex(fieldName))));
+            }
+
+            return model;
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
 
 }
