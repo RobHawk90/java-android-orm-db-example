@@ -4,6 +4,8 @@ import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 
 import java.lang.reflect.Field;
 import java.util.Date;
@@ -63,53 +65,10 @@ public abstract class Dao<T> {
     public boolean insert(T model) {
         try {
             Class<?> modelType = model.getClass();
-
-            String tableName = "";
-            if (modelType.isAnnotationPresent(Table.class))
-                tableName = modelType.getAnnotation(Table.class).value();
-            if (tableName.isEmpty())
-                tableName = modelType.getSimpleName();
-
-            List<Field> fields = new LinkedList<>();
-            for (Field field : modelType.getDeclaredFields())
-                if (!field.isAnnotationPresent(Ignore.class) && !field.isAnnotationPresent(Id.class) && !field.getName().equals("serialVersionUID"))
-                    fields.add(field);
-
-            Field idField = null;
-            for (Field field : modelType.getDeclaredFields())
-                if (field.isAnnotationPresent(Id.class))
-                    idField = field;
-
-            ContentValues values = new ContentValues();
-
-            for (Field field : fields) {
-                Class<?> fieldType = field.getType();
-
-                String fieldName = field.getName();
-                if (field.isAnnotationPresent(Column.class))
-                    fieldName = field.getAnnotation(Column.class).value();
-
-                if (fieldType.equals(String.class))
-                    values.put(fieldName, field.get(model).toString());
-                else if (fieldType.equals(Integer.class) || fieldType.equals(int.class))
-                    values.put(fieldName, field.getInt(model));
-                else if (fieldType.equals(Double.class) || fieldType.equals(double.class))
-                    values.put(fieldName, field.getDouble(model));
-                else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class))
-                    values.put(fieldName, field.getBoolean(model));
-                else if (fieldType.equals(Long.class) || fieldType.equals(long.class))
-                    values.put(fieldName, field.getLong(model));
-                else if (fieldType.equals(Float.class) || fieldType.equals(float.class))
-                    values.put(fieldName, field.getFloat(model));
-                else if (fieldType.equals(Short.class) || fieldType.equals(short.class))
-                    values.put(fieldName, field.getShort(model));
-                else if (fieldType.equals(byte[].class))
-                    values.put(fieldName, (byte[]) field.get(model));
-                else if (fieldType.equals(Byte.class) || fieldType.equals(byte.class))
-                    values.put(fieldName, field.getByte(model));
-                else if (fieldType.equals(Date.class))
-                    values.put(fieldName, field.get(model).toString());
-            }
+            String tableName = getTableName(modelType);
+            List<Field> fields = getNonIgnoredNorIdFields(modelType);
+            Field idField = getIdField(modelType);
+            ContentValues values = getContentValues(model, fields);
 
             long result = getWdb().insert(tableName, null, values);
 
@@ -124,9 +83,115 @@ public abstract class Dao<T> {
         return false;
     }
 
-    public abstract boolean update(T model);
+    @NonNull
+    private ContentValues getContentValues(T model, List<Field> fields) throws IllegalAccessException {
+        ContentValues values = new ContentValues();
 
-    public abstract boolean delete(T model);
+        for (Field field : fields) {
+            Class<?> fieldType = field.getType();
+
+            String fieldName = field.getName();
+            if (field.isAnnotationPresent(Column.class))
+                fieldName = field.getAnnotation(Column.class).value();
+
+            if (fieldType.equals(String.class))
+                values.put(fieldName, field.get(model).toString());
+            else if (fieldType.equals(Integer.class) || fieldType.equals(int.class))
+                values.put(fieldName, field.getInt(model));
+            else if (fieldType.equals(Double.class) || fieldType.equals(double.class))
+                values.put(fieldName, field.getDouble(model));
+            else if (fieldType.equals(Boolean.class) || fieldType.equals(boolean.class))
+                values.put(fieldName, field.getBoolean(model));
+            else if (fieldType.equals(Long.class) || fieldType.equals(long.class))
+                values.put(fieldName, field.getLong(model));
+            else if (fieldType.equals(Float.class) || fieldType.equals(float.class))
+                values.put(fieldName, field.getFloat(model));
+            else if (fieldType.equals(Short.class) || fieldType.equals(short.class))
+                values.put(fieldName, field.getShort(model));
+            else if (fieldType.equals(byte[].class))
+                values.put(fieldName, (byte[]) field.get(model));
+            else if (fieldType.equals(Byte.class) || fieldType.equals(byte.class))
+                values.put(fieldName, field.getByte(model));
+            else if (fieldType.equals(Date.class))
+                values.put(fieldName, field.get(model).toString());
+        }
+
+        return values;
+    }
+
+    @Nullable
+    private Field getIdField(Class<?> modelType) {
+        Field idField = null;
+        for (Field field : modelType.getDeclaredFields())
+            if (field.isAnnotationPresent(Id.class))
+                idField = field;
+        return idField;
+    }
+
+    @NonNull
+    private List<Field> getNonIgnoredNorIdFields(Class<?> modelType) {
+        List<Field> fields = new LinkedList<>();
+        for (Field field : modelType.getDeclaredFields())
+            if (!field.isAnnotationPresent(Ignore.class) && !field.isAnnotationPresent(Id.class) && !field.getName().equals("serialVersionUID"))
+                fields.add(field);
+        return fields;
+    }
+
+    private String getTableName(Class<?> modelType) {
+        String tableName = "";
+        if (modelType.isAnnotationPresent(Table.class))
+            tableName = modelType.getAnnotation(Table.class).value();
+        if (tableName.isEmpty())
+            tableName = modelType.getSimpleName();
+        return tableName;
+    }
+
+    public boolean update(T model) {
+        try {
+            Class<?> modelType = model.getClass();
+            String tableName = getTableName(modelType);
+            List<Field> fields = getNonIgnoredNorIdFields(modelType);
+            Field idField = getIdField(modelType);
+            ContentValues values = getContentValues(model, fields);
+
+            if (idField != null) {
+                String where = getIdFieldName(idField) + " = " + idField.getInt(model);
+                int result = getWdb().update(tableName, values, where, null);
+                return result > 0;
+            }
+
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
+
+    private String getIdFieldName(Field idField) {
+        String fieldName = "";
+        if (idField.isAnnotationPresent(Id.class))
+            idField.getAnnotation(Id.class).value();
+        if (fieldName.isEmpty())
+            fieldName = idField.getName();
+        return fieldName;
+    }
+
+    public boolean delete(T model) {
+        try {
+            Class<?> modelType = model.getClass();
+            String tableName = getTableName(modelType);
+            Field idField = getIdField(modelType);
+            if (idField != null) {
+                String where = getIdFieldName(idField) + " = " + idField.getInt(model);
+                int result = getWdb().delete(tableName, where, null);
+                return result > 0;
+            }
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        }
+
+        return false;
+    }
 
     public abstract T findById(int id);
 

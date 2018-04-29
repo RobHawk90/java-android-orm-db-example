@@ -17,20 +17,6 @@ public class TaskDao extends Dao<Task> {
     }
 
     @Override
-    public boolean update(Task model) {
-        String where = "id = " + model.id;
-        int result = getWdb().update("task", values(model), where, null);
-        return result > 0;
-    }
-
-    @Override
-    public boolean delete(Task model) {
-        String where = "id = " + model.id;
-        int result = getWdb().delete("task", where, null);
-        return result > 0;
-    }
-
-    @Override
     public Task findById(int id) {
         return getResultObject("SELECT * FROM task WHERE id = ?", id);
     }

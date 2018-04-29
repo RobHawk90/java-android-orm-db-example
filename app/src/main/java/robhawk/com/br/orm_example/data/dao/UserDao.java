@@ -16,20 +16,6 @@ public class UserDao extends Dao<User> {
     }
 
     @Override
-    public boolean update(User model) {
-        String where = "id = " + model.id;
-        int result = getWdb().update("user", values(model), where, null);
-        return result > 0;
-    }
-
-    @Override
-    public boolean delete(User model) {
-        String where = "id = " + model.id;
-        int result = getWdb().delete("user", where, null);
-        return result > 0;
-    }
-
-    @Override
     public User findById(int id) {
         return getResultObject("SELECT * FROM user WHERE id = ?", id);
     }
