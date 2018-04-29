@@ -7,7 +7,7 @@ import java.util.List;
 import robhawk.com.br.orm_example.data.model.Task;
 import robhawk.com.br.orm_example.orm.Dao;
 
-public class TaskDao extends Dao<Task> {
+public class TaskDao extends Dao {
 
     public TaskDao(Context context) {
         super(context);

@@ -8,7 +8,7 @@ import java.util.List;
 import robhawk.com.br.orm_example.data.model.User;
 import robhawk.com.br.orm_example.orm.Dao;
 
-public class UserDao extends Dao<User> {
+public class UserDao extends Dao {
 
     public UserDao(Context context) {
         super(context);
