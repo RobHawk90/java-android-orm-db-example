@@ -36,7 +36,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         initViews();
         initIntent();
-        mUserDao = new UserDao(this);
+        mUserDao = new UserDao();
     }
 
     private void initIntent() {

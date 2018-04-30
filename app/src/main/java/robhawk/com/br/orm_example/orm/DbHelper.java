@@ -6,7 +6,17 @@ import android.database.sqlite.SQLiteOpenHelper;
 
 public class DbHelper extends SQLiteOpenHelper {
 
-    public DbHelper(Context context) {
+    private static DbHelper INSTANCE;
+
+    public static DbHelper getInstance() {
+        return INSTANCE;
+    }
+
+    public static void init(Context context) {
+        INSTANCE = new DbHelper(context);
+    }
+
+    private DbHelper(Context context) {
         super(context, "orm_example", null, 1);
     }
 

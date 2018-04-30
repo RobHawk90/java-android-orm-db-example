@@ -1,6 +1,5 @@
 package robhawk.com.br.orm_example.orm;
 
-import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 
@@ -15,8 +14,8 @@ public class Dao {
     private final DbHelper dbHelper;
     private final ModelHelper modelHelper;
 
-    public Dao(Context context) {
-        dbHelper = new DbHelper(context);
+    public Dao() {
+        dbHelper = DbHelper.getInstance();
         modelHelper = new ModelHelper();
     }
 
