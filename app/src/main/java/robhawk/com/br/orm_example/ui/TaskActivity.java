@@ -19,6 +19,7 @@ import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.TaskDao;
 import robhawk.com.br.orm_example.data.model.Task;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 import robhawk.com.br.orm_example.util.DateUtil;
 
 public class TaskActivity extends AppCompatActivity {
@@ -53,7 +54,7 @@ public class TaskActivity extends AppCompatActivity {
 
     private void initData() {
         mUser = (User) getIntent().getSerializableExtra("user");
-        mTaskDao = new TaskDao();
+        mTaskDao = DaoFactory.create(TaskDao.class);
     }
 
     private void initViews() {

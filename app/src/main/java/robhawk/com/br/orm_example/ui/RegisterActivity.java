@@ -14,6 +14,7 @@ import android.widget.Toast;
 import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.UserDao;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -36,7 +37,7 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
         initViews();
         initIntent();
-        mUserDao = new UserDao();
+        mUserDao = DaoFactory.create(UserDao.class);
     }
 
     private void initIntent() {
@@ -80,11 +81,10 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     private boolean isEmailExists(String email) {
-        if (mUserDao.isEmailExists(email)) {
-            Toast.makeText(this, "An user was already registered as '" + email + "'", Toast.LENGTH_LONG).show();
-            return true;
-        }
-        return false;
+        if (mUserDao.findByEmail(email) == null)
+            return false;
+        Toast.makeText(this, "An user was already registered as '" + email + "'", Toast.LENGTH_LONG).show();
+        return true;
     }
 
     private boolean isWrongPassword(String password, String passwordConfirm) {

@@ -1,29 +1,15 @@
 package robhawk.com.br.orm_example.data.dao;
 
-import android.database.Cursor;
-
-import java.util.List;
-
 import robhawk.com.br.orm_example.data.model.User;
-import robhawk.com.br.orm_example.orm.Dao;
+import robhawk.com.br.orm_example.orm.annotation.Query;
+import robhawk.com.br.orm_example.orm.reflection.Dao;
 
-public class UserDao extends Dao {
+public interface UserDao extends Dao<User> {
 
-    public User findById(int id) {
-        return findById(id, User.class);
-    }
+    @Query("SELECT * FROM user WHERE email = ? AND password = ?")
+    User findByEmailAndPassword(String email, String password);
 
-    public List<User> listAll() {
-        return listAll(User.class);
-    }
-
-    public User auth(String email, String password) {
-        return getResultObject(User.class, "SELECT * FROM user WHERE email = ? AND password = ?", email, password);
-    }
-
-    public boolean isEmailExists(String email) {
-        Cursor cursor = getCursor("SELECT * FROM user WHERE email = ?", email);
-        return cursor.moveToNext();
-    }
+    @Query("SELECT * FROM user WHERE email = ?")
+    User findByEmail(String email);
 
 }

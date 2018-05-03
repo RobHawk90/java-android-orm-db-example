@@ -13,6 +13,7 @@ import android.widget.Toast;
 import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.UserDao;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
@@ -25,7 +26,7 @@ public class LoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         initViews();
-        mUserDao = new UserDao();
+        mUserDao = DaoFactory.create(UserDao.class);
     }
 
     private void initViews() {
@@ -46,7 +47,7 @@ public class LoginActivity extends AppCompatActivity {
         String email = mEmail.getText().toString();
         String password = mPassword.getText().toString();
 
-        User user = mUserDao.auth(email, password);
+        User user = mUserDao.findByEmailAndPassword(email, password);
 
         if (user == null)
             Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();

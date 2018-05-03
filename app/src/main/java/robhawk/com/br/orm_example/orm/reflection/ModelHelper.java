@@ -5,6 +5,9 @@ import android.database.Cursor;
 import android.support.annotation.NonNull;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -169,6 +172,23 @@ public class ModelHelper {
             e.printStackTrace();
         }
         return "";
+    }
+
+    public <T extends Dao> Class<?> getModelType(Class<T> daoType) {
+        for (Type type : daoType.getGenericInterfaces())
+            if (type.toString().contains(Dao.class.getName()))
+                return (Class<?>) ((ParameterizedType) type).getActualTypeArguments()[0];
+        return null;
+    }
+
+    public Class<?> getReturnType(Method method) {
+        Type genericType = method.getGenericReturnType();
+        try {
+            ParameterizedType param = ParameterizedType.class.cast(genericType);
+            return (Class<?>) param.getActualTypeArguments()[0];
+        } catch (Exception e) {
+            return (Class<?>) genericType;
+        }
     }
 
 }
