@@ -13,4 +13,8 @@
     <string name="completed">Completed</string>
     <string name="created_by">Created by</string>
     <string name="edit">Edit</string>
+    <string name="invalid_email_password">Invalid email/password</string>
+    <string name="email_x_already_exists">Emai \'%s\' already exists</string>
+    <string name="register_error_verify_informations">%s, wasn\'t possible to register now, please verify your informations</string>
+    <string name="passwords_dont_match">Passwords don\'t match</string>
 </resources>

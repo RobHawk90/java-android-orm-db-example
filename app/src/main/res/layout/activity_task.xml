@@ -1,13 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.TaskActivity">
+    tools:context=".ui.task.TaskActivity">
 
     <data>
 
         <variable
-            name="task"
-            type="robhawk.com.br.orm_example.data.model.Task" />
+            name="vm"
+            type="robhawk.com.br.orm_example.ui.task.TaskViewModel" />
     </data>
 
     <LinearLayout
@@ -17,29 +18,31 @@
         android:padding="5dp">
 
         <EditText
-            android:id="@+id/activity_task_description"
+            android:id="@+id/description"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/description"
             android:inputType="text"
-            android:text="@={task.description}" />
+            android:text="@={vm.getTask().description}" />
 
-        <Button
-            android:id="@+id/activity_task_date"
+        <robhawk.com.br.orm_example.ui.custom.CalendarView
+            android:id="@+id/date"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="showDatePicker" />
+            android:text="@={vm.getTask().date}" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="add"
+            android:onClick="@{() -> vm.add()}"
             android:text="@string/add" />
 
         <android.support.v7.widget.RecyclerView
-            android:id="@+id/activity_task_list"
+            android:id="@+id/list"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content" />
+            android:layout_height="wrap_content"
+            android:adapter="@{vm.adapter}"
+            app:layoutManager="android.support.v7.widget.LinearLayoutManager" />
 
     </LinearLayout>
 </layout>

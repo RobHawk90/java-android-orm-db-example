@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     android:orientation="vertical"
     android:padding="5dp"
-    tools:context=".ui.TaskDetailActivity">
+    tools:context=".ui.task.TaskDetailActivity">
 
     <TextView
         android:layout_width="wrap_content"

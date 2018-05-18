@@ -1,13 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".ui.LoginActivity">
+    tools:context=".ui.login.LoginActivity">
 
     <data>
 
         <variable
-            name="user"
-            type="robhawk.com.br.orm_example.data.model.User" />
+            name="vm"
+            type="robhawk.com.br.orm_example.ui.login.LoginViewModel" />
 
     </data>
 
@@ -18,32 +18,32 @@
         android:padding="5dp">
 
         <EditText
-            android:id="@+id/activity_login_email"
+            android:id="@+id/email"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/email"
             android:inputType="textEmailAddress"
-            android:text="@={user.email}" />
+            android:text="@={vm.getUser().email}" />
 
         <EditText
-            android:id="@+id/activity_login_password"
+            android:id="@+id/password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:hint="@string/password"
             android:imeOptions="actionDone"
             android:inputType="textPassword"
-            android:text="@={user.password}" />
+            android:text="@={vm.getUser().password}" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="authenticate"
+            android:onClick="@{() -> vm.authenticate()}"
             android:text="@string/enter" />
 
         <Button
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:onClick="register"
+            android:onClick="@{()-> vm.register()}"
             android:text="@string/register" />
 
     </LinearLayout>

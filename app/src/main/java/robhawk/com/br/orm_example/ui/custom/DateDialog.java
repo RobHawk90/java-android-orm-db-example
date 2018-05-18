@@ -1,7 +1,8 @@
-package robhawk.com.br.orm_example.ui;
+package robhawk.com.br.orm_example.ui.custom;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;
+import android.app.FragmentManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatDialogFragment;
@@ -41,7 +42,7 @@ public class DateDialog extends AppCompatDialogFragment implements DatePickerDia
         this.listener = listener;
     }
 
-    interface OnDateChangedListener {
+    public interface OnDateChangedListener {
         void dateChanged(Calendar calendar);
     }
 }

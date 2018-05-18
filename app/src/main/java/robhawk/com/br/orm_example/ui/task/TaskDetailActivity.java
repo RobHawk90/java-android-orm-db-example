@@ -1,4 +1,4 @@
-package robhawk.com.br.orm_example.ui;
+package robhawk.com.br.orm_example.ui.task;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -17,6 +17,7 @@ import robhawk.com.br.orm_example.data.dao.TaskDao;
 import robhawk.com.br.orm_example.data.dao.UserDao;
 import robhawk.com.br.orm_example.data.model.Task;
 import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
+import robhawk.com.br.orm_example.ui.custom.DateDialog;
 import robhawk.com.br.orm_example.util.DateUtil;
 
 public class TaskDetailActivity extends AppCompatActivity {

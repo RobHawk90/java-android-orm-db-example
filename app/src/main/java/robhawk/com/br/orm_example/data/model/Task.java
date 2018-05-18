@@ -6,6 +6,7 @@ import java.util.Date;
 
 import robhawk.com.br.orm_example.orm.annotation.Id;
 import robhawk.com.br.orm_example.orm.annotation.Table;
+import robhawk.com.br.orm_example.util.DateUtil;
 
 @Table("task")
 public class Task implements Serializable {
@@ -25,6 +26,14 @@ public class Task implements Serializable {
         this.description = description;
         this.date = date;
         this.idUser = idUser;
+    }
+
+    public String getDate() {
+        return DateUtil.formatPtBr(date);
+    }
+
+    public void setDate(String date) {
+        this.date = DateUtil.parsePtBr(date);
     }
 
     @Override

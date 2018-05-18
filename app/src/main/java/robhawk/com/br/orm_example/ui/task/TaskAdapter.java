@@ -1,4 +1,4 @@
-package robhawk.com.br.orm_example.ui;
+package robhawk.com.br.orm_example.ui.task;
 
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
