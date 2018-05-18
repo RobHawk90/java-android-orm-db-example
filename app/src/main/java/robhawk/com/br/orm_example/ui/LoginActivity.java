@@ -1,6 +1,7 @@
 package robhawk.com.br.orm_example.ui;
 
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -13,27 +14,30 @@ import android.widget.Toast;
 import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.UserDao;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.databinding.ActivityLoginBinding;
 import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private EditText mEmail;
-    private EditText mPassword;
     private UserDao mUserDao;
+    private User mUser;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        initViews();
+
+        mUser = new User();
         mUserDao = DaoFactory.create(UserDao.class);
+
+        ActivityLoginBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_login);
+        dataBinding.setUser(mUser);
+
+        initViews();
     }
 
     private void initViews() {
-        mEmail = findViewById(R.id.activity_login_email);
-        mPassword = findViewById(R.id.activity_login_password);
-
-        mPassword.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        EditText password = findViewById(R.id.activity_login_password);
+        password.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE)
@@ -44,15 +48,12 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void authenticate(View view) {
-        String email = mEmail.getText().toString();
-        String password = mPassword.getText().toString();
+        User authUser = mUserDao.findByEmailAndPassword(mUser.email, mUser.password);
 
-        User user = mUserDao.findByEmailAndPassword(email, password);
-
-        if (user == null)
+        if (authUser == null)
             Toast.makeText(this, "Invalid credentials", Toast.LENGTH_SHORT).show();
         else
-            startTaskActivity(user);
+            startTaskActivity(authUser);
     }
 
     private void startTaskActivity(User user) {
@@ -62,9 +63,7 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void register(View view) {
-        String email = mEmail.getText().toString();
-        String password = mPassword.getText().toString();
-        startRegisterActivity(email, password);
+        startRegisterActivity(mUser.email, mUser.password);
     }
 
     private void startRegisterActivity(String email, String password) {

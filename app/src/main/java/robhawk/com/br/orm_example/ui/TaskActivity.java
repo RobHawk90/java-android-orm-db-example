@@ -3,6 +3,7 @@ package robhawk.com.br.orm_example.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -13,12 +14,12 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import java.util.Calendar;
-import java.util.Date;
 
 import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.TaskDao;
 import robhawk.com.br.orm_example.data.model.Task;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.databinding.ActivityTaskBinding;
 import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 import robhawk.com.br.orm_example.util.DateUtil;
 
@@ -29,6 +30,7 @@ public class TaskActivity extends AppCompatActivity {
     private EditText mDescription;
     private TaskDao mTaskDao;
 
+    private Task mTask;
     private User mUser;
     private TaskAdapter mAdapter;
 
@@ -41,7 +43,6 @@ public class TaskActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_task);
         initData();
         initViews();
     }
@@ -53,8 +54,13 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     private void initData() {
-        mUser = (User) getIntent().getSerializableExtra("user");
         mTaskDao = DaoFactory.create(TaskDao.class);
+        mUser = (User) getIntent().getSerializableExtra("user");
+        mTask = new Task();
+        mTask.idUser = mUser.id;
+
+        ActivityTaskBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_task);
+        dataBinding.setTask(mTask);
     }
 
     private void initViews() {
@@ -133,19 +139,20 @@ public class TaskActivity extends AppCompatActivity {
     }
 
     public void add(View view) {
-        Date date = DateUtil.parsePtBr(mDate.getText().toString());
-        String description = mDescription.getText().toString();
+        mTask.date = DateUtil.parsePtBr(mDate.getText().toString());
 
-        Task task = new Task(description, date, mUser.id);
-        if (mTaskDao.insert(task)) {
-            mAdapter.add(task);
+        if (mTaskDao.insert(mTask)) {
+            mAdapter.add(mTask);
+
+            mTask = new Task();
+            mTask.idUser = mUser.id;
 
             mDate.setText(DateUtil.formatPtBrNow());
             mDescription.setText("");
             mDescription.requestFocus();
 
-            Toast.makeText(this, "'" + description + "' was added", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "'" + mTask.description + "' was added", Toast.LENGTH_SHORT).show();
         } else
-            Toast.makeText(this, "Can't add task '" + description + "'", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "Can't add task '" + mTask.description + "'", Toast.LENGTH_SHORT).show();
     }
 }

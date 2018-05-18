@@ -2,6 +2,7 @@ package robhawk.com.br.orm_example.ui;
 
 import android.content.Context;
 import android.content.Intent;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.KeyEvent;
@@ -14,14 +15,12 @@ import android.widget.Toast;
 import robhawk.com.br.orm_example.R;
 import robhawk.com.br.orm_example.data.dao.UserDao;
 import robhawk.com.br.orm_example.data.model.User;
+import robhawk.com.br.orm_example.databinding.ActivityRegisterBinding;
 import robhawk.com.br.orm_example.orm.reflection.DaoFactory;
 
 public class RegisterActivity extends AppCompatActivity {
 
-    private EditText mName;
-    private EditText mEmail;
-    private EditText mPassword;
-    private EditText mPasswordConfirm;
+    private User mUser;
     private UserDao mUserDao;
 
     public static Intent getIntent(Context context, String email, String password) {
@@ -34,27 +33,27 @@ public class RegisterActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_register);
+
+        mUser = new User();
+        mUserDao = DaoFactory.create(UserDao.class);
+
+        ActivityRegisterBinding dataBinding = DataBindingUtil.setContentView(this, R.layout.activity_register);
+        dataBinding.setUser(mUser);
+
         initViews();
         initIntent();
-        mUserDao = DaoFactory.create(UserDao.class);
     }
 
     private void initIntent() {
         Intent intent = getIntent();
-        String email = intent.getStringExtra("email");
-        String password = intent.getStringExtra("password");
-        mEmail.setText(email);
-        mPassword.setText(password);
+        mUser.email = intent.getStringExtra("email");
+        mUser.password = intent.getStringExtra("password");
     }
 
     private void initViews() {
-        mName = findViewById(R.id.activity_register_name);
-        mEmail = findViewById(R.id.activity_register_email);
-        mPassword = findViewById(R.id.activity_register_password);
-        mPasswordConfirm = findViewById(R.id.activity_register_password_confirm);
+        EditText passwordConfirm = findViewById(R.id.activity_register_password_confirm);
 
-        mPasswordConfirm.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+        passwordConfirm.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int actionId, KeyEvent keyEvent) {
                 if (actionId == EditorInfo.IME_ACTION_DONE)
@@ -65,19 +64,13 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void register(View view) {
-        String name = mName.getText().toString();
-        String email = mEmail.getText().toString();
-        String password = mPassword.getText().toString();
-        String passwordConfirm = mPasswordConfirm.getText().toString();
+        if (isWrongPassword(mUser.password, mUser.passwordConfirm)) return;
+        if (isEmailExists(mUser.email)) return;
 
-        if (isWrongPassword(password, passwordConfirm)) return;
-        if (isEmailExists(email)) return;
-
-        User user = new User(name, email, password);
-        if (mUserDao.insert(user))
-            startTaskActivity(user);
+        if (mUserDao.insert(mUser))
+            startTaskActivity(mUser);
         else
-            Toast.makeText(this, name + ", can't register you now, please verify your information.", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, mUser.name + ", can't register you now, please verify your information.", Toast.LENGTH_SHORT).show();
     }
 
     private boolean isEmailExists(String email) {

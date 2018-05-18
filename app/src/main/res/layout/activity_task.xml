@@ -1,34 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="5dp"
     tools:context=".ui.TaskActivity">
 
-    <EditText
-        android:id="@+id/activity_task_description"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="@string/description"
-        android:inputType="text" />
+    <data>
 
-    <Button
-        android:id="@+id/activity_task_date"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:onClick="showDatePicker" />
+        <variable
+            name="task"
+            type="robhawk.com.br.orm_example.data.model.Task" />
+    </data>
 
-    <Button
-        android:onClick="add"
-        android:text="@string/add"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:padding="5dp">
 
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/activity_task_list"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        <EditText
+            android:id="@+id/activity_task_description"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:hint="@string/description"
+            android:inputType="text"
+            android:text="@={task.description}" />
 
-</LinearLayout>
+        <Button
+            android:id="@+id/activity_task_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="showDatePicker" />
+
+        <Button
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:onClick="add"
+            android:text="@string/add" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/activity_task_list"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+</layout>
